@@ -104,13 +104,17 @@ package() {
 
 	#Passenger bin
 	install -d "$pkgdir"/usr/lib/passenger
-	install -Dm644 "buildout/*" "$pkgdir"/usr/lib/passenger/buildout/
-	install -Dm644 "helper-scripts/*" "$pkgdir"/usr/lib/passenger/helper-scripts/
-	install -Dm644 "lib/*" "$pkgdir"/usr/lib/passenger/lib/
+	cp -R {buildout,helper-scripts,lib} "$pkgdir"/usr/lib/passenger/
 
 	#Passenger doc
 	install -d "$pkgdir"/usr/share/doc/passenger
-	install -Dm644 "doc/*" "$pkgdir"/usr/share/doc/passenger/
+	cp -R doc "$pkgdir"/usr/share/doc/passenger/
 
 	#Passenger man
+	install -d "$pkgdir"/usr/share/man/man1
+	install -d "$pkgdir"/usr/share/man/man8
+	gzip -9 man/passenger-config.1 > "$pkgdir"/usr/share/man/man1/passenger-config.1.gz
+	gzip -9 man/passenger-stress-test.1 > "$pkgdir"/usr/share/man/man1/passenger-stress-test.1.gz
+	gzip -9 man/passenger-memory-stats.8 > "$pkgdir"/usr/share/man/man8/passenger-memory-stats.8.gz
+	gzip -9 man/passenger-status.8 > "$pkgdir"/usr/share/man/man8/passenger-status.8.gz
 }
