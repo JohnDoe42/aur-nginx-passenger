@@ -1,0 +1,116 @@
+# Maintainer: Tom Richards <tom@tomrichards.net>
+_nginxver=1.4.4
+_passengerver=4.0.30
+pkgname=nginx_passenger
+pkgver=1.4.4
+pkgrel=1
+pkgdesc="HTTP Server with Passenger Module"
+arch=('i686' 'x86_64')
+url='http://nginx.org'
+license=('custom')
+depends=('pcre' 'zlib' 'openssl' 'ruby' 'ruby-rack' 'curl')
+conflicts=()
+backup=('etc/nginx/fastcgi.conf'
+        'etc/nginx/fastcgi_params'
+        'etc/nginx/koi-win'
+        'etc/nginx/koi-utf'
+        'etc/nginx/mime.types'
+        'etc/nginx/nginx.conf'
+        'etc/nginx/scgi_params'
+        'etc/nginx/uwsgi_params'
+        'etc/nginx/win-utf'
+        'etc/logrotate.d/nginx')
+source=("http://nginx.org/download/nginx-$_nginxver.tar.gz"
+	"https://github.com/phusion/passenger/archive/release-$_passengerver.tar.gz"
+	'service'
+	'logrotate')
+sha256sums=('7c989a58e5408c9593da0bebcd0e4ffc3d892d1316ba5042ddb0be5b0b4102b9'
+            '1fef90db1d39f485b8853ba223aa7e4615b91583466068982140f3323b1dcfb4'
+            '05fdc0c0483410944b988d7f4beabb00bec4a44a41bd13ebc9b78585da7d3f9b'
+            '272907d3213d69dac3bd6024d6d150caa23cb67d4f121e4171f34ba5581f9e98')
+
+build() {
+	cd "$srcdir/passenger-release-$_passengerver"
+	_nginx_addon_dir=`bin/passenger-config --nginx-addon-dir`
+
+	cd "$srcdir/nginx-$_nginxver"
+
+	./configure \
+        --prefix=/etc/nginx \
+        --conf-path=/etc/nginx/nginx.conf \
+        --sbin-path=/usr/bin/nginx \
+        --pid-path=/run/nginx.pid \
+        --lock-path=/run/lock/nginx.lock \
+        --user=http \
+        --group=http \
+        --http-log-path=/var/log/nginx/access.log \
+        --error-log-path=stderr \
+        --http-client-body-temp-path=/var/lib/nginx/client-body \
+        --http-proxy-temp-path=/var/lib/nginx/proxy \
+        --http-fastcgi-temp-path=/var/lib/nginx/fastcgi \
+        --http-scgi-temp-path=/var/lib/nginx/scgi \
+        --http-uwsgi-temp-path=/var/lib/nginx/uwsgi \
+        --with-imap \
+        --with-imap_ssl_module \
+        --with-ipv6 \
+        --with-pcre-jit \
+        --with-file-aio \
+        --with-http_dav_module \
+        --with-http_gunzip_module \
+        --with-http_gzip_static_module \
+        --with-http_realip_module \
+        --with-http_spdy_module \
+        --with-http_ssl_module \
+        --with-http_stub_status_module \
+        --with-http_addition_module \
+        --with-http_degradation_module \
+        --with-http_flv_module \
+        --with-http_mp4_module \
+        --with-http_secure_link_module \
+        --with-http_sub_module \
+	--add-module="$_nginx_addon_dir"
+
+	make
+
+}
+
+package() {
+	#Nginx
+	cd "$srcdir/nginx-$_nginxver"
+	make DESTDIR="$pkgdir/" install
+
+	sed -e 's|\<user\s\+\w\+;|user html;|g' \
+	-e '44s|html|/usr/share/nginx/html|' \
+	-e '54s|html|/usr/share/nginx/html|' \
+	-i "$pkgdir"/etc/nginx/nginx.conf
+	rm "$pkgdir"/etc/nginx/*.default
+
+	install -d "$pkgdir"/var/lib/nginx
+	install -dm700 "$pkgdir"/var/lib/nginx/proxy
+
+	chmod 750 "$pkgdir"/var/log/nginx
+	chown http:log "$pkgdir"/var/log/nginx
+
+	install -d "$pkgdir"/usr/share/nginx
+	mv "$pkgdir"/etc/nginx/html/ "$pkgdir"/usr/share/nginx
+
+	install -Dm644 "$srcdir"/logrotate "$pkgdir"/etc/logrotate.d/nginx
+	install -Dm644 "$srcdir"/service "$pkgdir"/usr/lib/systemd/system/nginx.service
+	install -Dm644 LICENSE "$pkgdir"/usr/share/licenses/$pkgname/LICENSE
+	rmdir "$pkgdir/run"
+
+	#Passenger
+	cd "$srcdir/passenger-release-$_passengerver"
+
+	#Passenger bin
+	install -d "$pkgdir"/usr/lib/passenger
+	install -Dm644 "buildout/*" "$pkgdir"/usr/lib/passenger/buildout/
+	install -Dm644 "helper-scripts/*" "$pkgdir"/usr/lib/passenger/helper-scripts/
+	install -Dm644 "lib/*" "$pkgdir"/usr/lib/passenger/lib/
+
+	#Passenger doc
+	install -d "$pkgdir"/usr/share/doc/passenger
+	install -Dm644 "doc/*" "$pkgdir"/usr/share/doc/passenger/
+
+	#Passenger man
+}
