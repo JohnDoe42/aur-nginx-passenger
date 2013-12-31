@@ -1,7 +1,9 @@
 # Maintainer: Tom Richards <tom@tomrichards.net>
+
 _nginxver=1.4.4
 _passengerver=4.0.30
-pkgname=nginx_passenger
+
+pkgname=nginx-passenger
 pkgver=1.4.4
 pkgrel=1
 pkgdesc="HTTP Server with Passenger Module"
@@ -9,7 +11,7 @@ arch=('i686' 'x86_64')
 url='http://nginx.org'
 license=('custom')
 depends=('pcre' 'zlib' 'openssl' 'ruby' 'ruby-rack' 'curl')
-conflicts=()
+conflicts=('nginx' 'passenger')
 backup=('etc/nginx/fastcgi.conf'
         'etc/nginx/fastcgi_params'
         'etc/nginx/koi-win'
