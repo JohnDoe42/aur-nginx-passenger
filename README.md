@@ -8,7 +8,7 @@ related source files to build [nginx](http://nginx.org/) with support for
 # Instructions
 
 What, you wanted step-by-step install instructions?
-[This package](https://aur.archlinux.org/packages/netbeans-php/) is available from
+[This package](https://aur.archlinux.org/packages/nginx-passenger/) is available from
 the [AUR](https://aur.archlinux.org/). You can install it by using the official
 method for installing unsupported packages, which is exhaustively described in
 the [Arch User Repository](https://wiki.archlinux.org/index.php/Arch_User_Repository) wiki
