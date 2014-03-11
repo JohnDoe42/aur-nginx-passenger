@@ -5,7 +5,7 @@ _passengerver=4.0.38
 
 pkgname=nginx-passenger
 pkgver=1.4.6
-pkgrel=2
+pkgrel=3
 pkgdesc="HTTP Server with Passenger Module"
 arch=('i686' 'x86_64')
 url='http://nginx.org'
@@ -106,7 +106,11 @@ package() {
 	install -d "$pkgdir"/usr/lib/passenger/buildout
 	rm -r $(find . -name "Makefile" -or -name "*.o")
 	cp -R buildout/{agents,ruby} "$pkgdir"/usr/lib/passenger/buildout
-	cp -R {bin,ext,helper-scripts,lib,node_lib} "$pkgdir"/usr/lib/passenger/
+	cp -R {bin,helper-scripts,lib,node_lib} "$pkgdir"/usr/lib/passenger/
+
+	#Passenger native support
+	install -d "$pkgdir"/usr/lib/passenger/ext
+	cp -R ext/ruby "$pkgdir"/usr/lib/passenger/ext/
 
 	#Passenger doc
 	install -d "$pkgdir"/usr/share/doc/passenger
