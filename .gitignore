@@ -1,3 +1,7 @@
+#editor
+*.swp
+
+#package
 *.xz
 *.gz
 *.zip
