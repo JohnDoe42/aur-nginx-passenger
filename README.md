@@ -19,22 +19,22 @@ article.
 Once you've installed this package, nginx needs to be configured to enable passenger.
 Here's an example of /etc/nginx/nginx.conf:
 
-	http {
-		passenger_root /usr/lib/passenger;
-		passenger_ruby /usr/bin/ruby;
+    http {
+        passenger_root /usr/lib/passenger;
+        passenger_ruby /usr/bin/ruby;
 
-		...
+        ...
 
-		server {
-			listen 443 ssl spdy;
-			server_name www.example.com;
-			root /srv/http/example/public; # <-- be sure to point to 'public'!
-			passenger_enabled on;
+        server {
+            listen 443 ssl spdy;
+            server_name www.example.com;
+            root /srv/http/example/public; # <-- be sure to point to 'public'!
+            passenger_enabled on;
 
             ...
-		}
+        }
 
-		...
-	}
+        ...
+    }
 
 Please consult the [Phusion Passenger users guide, Nginx version](https://www.phusionpassenger.com/documentation/Users%20guide%20Nginx.html) for more advanced configuration.
