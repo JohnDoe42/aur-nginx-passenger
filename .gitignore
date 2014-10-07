@@ -2,6 +2,7 @@
 *.swp
 
 #package
+*.tar
 *.xz
 *.gz
 *.zip
