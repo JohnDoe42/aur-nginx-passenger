@@ -24,6 +24,7 @@ backup=('etc/nginx/fastcgi.conf'
         'etc/nginx/uwsgi_params'
         'etc/nginx/win-utf'
         'etc/logrotate.d/nginx')
+install="${pkgname}.install"
 source=("http://nginx.org/download/nginx-$_nginxver.tar.gz"
     "https://github.com/phusion/passenger/archive/release-$_passengerver.tar.gz"
     'cleanup-headers.patch'
