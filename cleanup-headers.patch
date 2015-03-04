@@ -1,40 +1,56 @@
-diff --git a/ext/common/agents/HelperAgent/RequestHandler.h b/ext/common/agents/HelperAgent/RequestHandler.h
-index c80d052..b2f2980 100644
---- a/ext/common/agents/HelperAgent/RequestHandler.h
-+++ b/ext/common/agents/HelperAgent/RequestHandler.h
-@@ -1114,13 +1114,6 @@ private:
- 			removeHeader(headerData, transferEncoding);
- 		}
+diff --git a/ext/common/agents/HelperAgent/RequestHandler/ForwardResponse.cpp b/ext/common/agents/HelperAgent/RequestHandler/ForwardResponse.cpp
+index 6428408..c9a59cc 100644
+--- a/ext/common/agents/HelperAgent/RequestHandler/ForwardResponse.cpp
++++ b/ext/common/agents/HelperAgent/RequestHandler/ForwardResponse.cpp
+@@ -714,12 +714,6 @@ constructHeaderBuffersForResponse(Request *req, struct iovec *buffers,
+ 		PUSH_STATIC_BUFFER("\r\n");
+ 	}
  
--		// Add X-Powered-By.
--		if (getBoolOption(client, "PASSENGER_SHOW_VERSION_IN_HEADER", true)) {
--			headerData.append("X-Powered-By: Phusion Passenger " PASSENGER_VERSION "\r\n");
+-	if (showVersionInHeader) {
+-		PUSH_STATIC_BUFFER("X-Powered-By: " PROGRAM_NAME " " PASSENGER_VERSION "\r\n\r\n");
+-	} else {
+-		PUSH_STATIC_BUFFER("X-Powered-By: " PROGRAM_NAME "\r\n\r\n");
+-	}
+-
+ 	nbuffers = i;
+ 	return true;
+ 
+diff --git a/ext/common/agents/HelperAgent/RequestHandler/TurboCaching.h b/ext/common/agents/HelperAgent/RequestHandler/TurboCaching.h
+index 82ea223..f5cb2a3 100644
+--- a/ext/common/agents/HelperAgent/RequestHandler/TurboCaching.h
++++ b/ext/common/agents/HelperAgent/RequestHandler/TurboCaching.h
+@@ -154,12 +154,6 @@ private:
+ 		}
+ 		PUSH_STATIC_STRING("\r\n");
+ 
+-		if (prep.showVersionInHeader) {
+-			PUSH_STATIC_STRING("X-Powered-By: " PROGRAM_NAME " " PASSENGER_VERSION "\r\n");
 -		} else {
--			headerData.append("X-Powered-By: Phusion Passenger\r\n");
+-			PUSH_STATIC_STRING("X-Powered-By: " PROGRAM_NAME "\r\n");
 -		}
 -
- 		// Add sticky session ID.
- 		if (client->stickySession && client->session != NULL) {
- 			StaticString cookieName = getStickySessionCookieName(client);
+ 		if (server->canKeepAlive(req)) {
+ 			if (httpVersion < 1010) {
+ 				// HTTP < 1.1 defaults to "Connection: close"
 diff --git a/ext/nginx/ContentHandler.c b/ext/nginx/ContentHandler.c
-index 8313951..53f023d 100644
+index 9ba443b..2e400c6 100644
 --- a/ext/nginx/ContentHandler.c
 +++ b/ext/nginx/ContentHandler.c
-@@ -1121,19 +1121,7 @@ process_header(ngx_http_request_t *r)
+@@ -1177,19 +1177,7 @@ process_header(ngx_http_request_t *r)
  
                  h->key.len = sizeof("Server") - 1;
                  h->key.data = (u_char *) "Server";
--                if( slcf->show_version_in_header == 0 ) {
+-                if (!passenger_main_conf.show_version_in_header) {
 -                    if (clcf->server_tokens) {
--                        h->value.data = (u_char *) (NGINX_VER " + Phusion Passenger");
+-                        h->value.data = (u_char *) (NGINX_VER " + " PROGRAM_NAME);
 -                    } else {
--                        h->value.data = (u_char *) ("nginx + Phusion Passenger");
+-                        h->value.data = (u_char *) ("nginx + " PROGRAM_NAME);
 -                    }
 -                } else {
 -                    if (clcf->server_tokens) {
--                        h->value.data = (u_char *) (NGINX_VER " + Phusion Passenger " PASSENGER_VERSION);
+-                        h->value.data = (u_char *) (NGINX_VER " + " PROGRAM_NAME " " PASSENGER_VERSION);
 -                    } else {
--                        h->value.data = (u_char *) ("nginx + Phusion Passenger " PASSENGER_VERSION);
+-                        h->value.data = (u_char *) ("nginx + " PROGRAM_NAME " " PASSENGER_VERSION);
 -                    }
 -                }
 +                h->value.data = (u_char *) ("nginx");
