@@ -20,7 +20,7 @@ Once you've installed this package, nginx needs to be configured to enable passe
 Here's an example of /etc/nginx/nginx.conf:
 
     http {
-        passenger_root /usr/lib/passenger;
+        passenger_root /usr/lib/ruby/vendor_ruby/phusion_passenger/locations.ini;
         passenger_ruby /usr/bin/ruby;
 
         ...
