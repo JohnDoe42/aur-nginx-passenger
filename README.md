@@ -20,11 +20,17 @@ Once you've installed this package, nginx needs to be configured to enable passe
 Here's an example of /etc/nginx/nginx.conf:
 
     http {
+        # Recommended
+        server_tokens off;
+        passenger_show_version_in_header off;
+
+        # Required
         passenger_root /usr/lib/ruby/vendor_ruby/phusion_passenger/locations.ini;
         passenger_ruby /usr/bin/ruby;
 
         ...
 
+        # Example server block
         server {
             listen 443 ssl spdy;
             server_name www.example.com;
