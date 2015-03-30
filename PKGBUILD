@@ -2,7 +2,7 @@
 # https://github.com/t-richards/aur-nginx-passenger
 
 _nginxver=1.6.2
-_passengerver=5.0.1
+_passengerver=5.0.5
 
 pkgname=nginx-passenger
 pkgver=1.6.2
@@ -11,7 +11,7 @@ pkgdesc="HTTP Server with Passenger Module"
 arch=('i686' 'x86_64')
 url='http://nginx.org'
 license=('custom')
-depends=('pcre' 'zlib' 'openssl' 'ruby' 'ruby-rack' 'curl' 'libev')
+depends=('pcre' 'zlib' 'openssl' 'ruby' 'ruby-rack' 'curl')
 optdepends=('python: Support for python web apps' 'nodejs: Support for node.js web apps')
 makedepends=('hardening-wrapper' 'apache')
 conflicts=('nginx' 'passenger')
@@ -28,25 +28,17 @@ backup=('etc/nginx/fastcgi.conf'
 install="${pkgname}.install"
 source=("http://nginx.org/download/nginx-$_nginxver.tar.gz"
     "https://github.com/phusion/passenger/archive/release-$_passengerver.tar.gz"
-    'cleanup-headers.patch'
     'locations.ini'
     'service'
     'logrotate')
 sha256sums=('b5608c2959d3e7ad09b20fc8f9e5bd4bc87b3bc8ba5936a513c04ed8f1391a18'
-            '2bc70154045a876049a1e00a3e12139ff0f7a435f86fc89a5aee41a8045c648f'
-            '6f63db56cbc0ca39ba1d70757a523569e33f5bd8d1f134a77acd89b5e4994bf9'
+            'e34e7cf9828426ac538522b139940008fbc4d7c2e1bfc531eaf2ef05c79b960a'
             '6a99bd6544cadd0563b549a5fb24d0aed98fe51f5dcdaacbfa2f9b8026360d1e'
             '6fe4c5eb7332f5eebdd7e08e46256a3d344bd375e9134be66013fbc52059e1ac'
             '272907d3213d69dac3bd6024d6d150caa23cb67d4f121e4171f34ba5581f9e98')
 
-prepare() {
-    cd "$srcdir/passenger-release-$_passengerver"
-    patch -p1 < ../cleanup-headers.patch
-}
-
 build() {
     # Setup
-    export USE_VENDORED_LIBEV=no
     export EXTRA_CFLAGS=$CFLAGS
     export EXTRA_CXXFLAGS=$CXXFLAGS
     cd "$srcdir/passenger-release-$_passengerver"
@@ -141,7 +133,7 @@ package() {
 
     # share
     install -d "$pkgdir"/usr/share/passenger
-    cp -R {helper-scripts,resources} "$pkgdir"/usr/share/passenger/
+    cp -R helper-scripts "$pkgdir"/usr/share/passenger/
 
     # vendored ruby
     install -Dm644 "$srcdir"/locations.ini "$pkgdir"/usr/lib/ruby/vendor_ruby/phusion_passenger/locations.ini
